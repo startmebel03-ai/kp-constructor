@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Старт Мебель · Конструктор КП</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 /* ─────────────────────────────────────────
    CSS VARIABLES
@@ -322,6 +323,22 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   border-radius: 0;
+}
+.btn-download {
+  padding: 12px 28px;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.btn-download:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 /* ─────────────────────────────────────────
@@ -845,12 +862,14 @@ body {
 <div id="pdf-wrap">
   <div class="action-bar">
     <button class="btn-back" onclick="goBack()">← Редактировать</button>
-    <button class="btn-print" onclick="window.print()">🖨 Печать / PDF</button>
+    <button class="btn-download" id="btn-dl-top" onclick="downloadPdf()">⬇ Скачать PDF</button>
+    <button class="btn-print" onclick="window.print()">🖨 Печать</button>
   </div>
   <div id="pdf-pages"></div>
   <div class="action-bar" style="border-top:1px solid var(--sand);border-bottom:none;">
     <button class="btn-back" onclick="goBack()">← Редактировать</button>
-    <button class="btn-print" onclick="window.print()">🖨 Печать / PDF</button>
+    <button class="btn-download" id="btn-dl-bot" onclick="downloadPdf()">⬇ Скачать PDF</button>
+    <button class="btn-print" onclick="window.print()">🖨 Печать</button>
   </div>
 </div>
 
@@ -1298,6 +1317,33 @@ function generate() {
   document.getElementById('form-wrap').style.display = 'none';
   document.getElementById('pdf-wrap').style.display  = 'block';
   window.scrollTo(0, 0);
+}
+
+function downloadPdf() {
+  const btns = [document.getElementById('btn-dl-top'), document.getElementById('btn-dl-bot')];
+  btns.forEach(b => { b.disabled = true; b.textContent = '⏳ Генерация…'; });
+
+  const client = document.getElementById('f-client').value.trim();
+  const date   = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
+  const fname  = ('КП_СтартМебель' + (client ? '_' + client : '') + '_' + date).replace(/\s+/g,'_') + '.pdf';
+
+  const el = document.getElementById('pdf-pages');
+
+  const opt = {
+    margin:      0,
+    filename:    fname,
+    image:       { type: 'jpeg', quality: 0.97 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, scrollY: 0 },
+    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:   { mode: ['css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(el).save().then(() => {
+    btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
+  }).catch(() => {
+    btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
+    alert('Ошибка генерации PDF. Попробуйте ещё раз.');
+  });
 }
 
 function goBack() {
