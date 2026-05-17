@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Старт Мебель · Конструктор КП</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   CSS VARIABLES
+───────────────────────────────────────── */
+:root {
+  --cream: #FDFCFA;
+  --warm-white: #F9F7F3;
+  --sand: #E8E0D0;
+  --taupe: #C4B8A4;
+  --dark: #2C2420;
+  --accent: #8B6914;
+  --accent-light: #D4A853;
+  --text: #3D3028;
+  --text-light: #7A6A56;
+  --crimson: #6B1E2A;
+}
+
+/* ─────────────────────────────────────────
+   RESET
+───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─────────────────────────────────────────
+   ФОРМА (экран)
+───────────────────────────────────────── */
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Скрыть pdf при обычном просмотре */
+#pdf-wrap { display: none; }
+
+/* Обёртка формы */
+#form-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* Шапка формы */
+.form-header {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--sand);
+  margin-bottom: 24px;
+}
+.form-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--crimson);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.form-sub {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+/* Секция */
+.fsec {
+  margin-top: 24px;
+  margin-bottom: 4px;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 1px solid var(--sand);
+  padding-bottom: 6px;
+}
+
+/* Поля */
+.frow { margin-bottom: 12px; }
+.frow label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--taupe);
+  margin-bottom: 5px;
+}
+.frow input,
+.frow select,
+.frow textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--dark);
+  background: #fff;
+  border: 1px solid var(--sand);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+.frow input:focus,
+.frow select:focus,
+.frow textarea:focus { border-color: var(--accent); }
+.frow select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C4B8A4' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.frow textarea { resize: vertical; min-height: 52px; }
+
+/* Сетки */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* Карточка позиции */
+.pos-card {
+  background: #fff;
+  border: 1px solid var(--sand);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.pos-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.pos-card-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--accent-light);
+  font-weight: 300;
+}
+.btn-rem {
+  background: none;
+  border: 1px solid var(--sand);
+  color: var(--taupe);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.4;
+  border-radius: 0;
+}
+.btn-rem:hover { border-color: #c0392b; color: #c0392b; }
+
+/* Фото загрузчик */
+.photo-zone {
+  position: relative;
+  border: 1px dashed var(--sand);
+  background: var(--warm-white);
+  padding: 14px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.photo-zone:hover { border-color: var(--accent); }
+.photo-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.photo-zone-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--taupe);
+  pointer-events: none;
+}
+.photo-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.photo-thumbs img {
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border: 1px solid var(--sand);
+}
+
+/* Превьюшка с крестиком */
+.thumb-wrap {
+  position: relative;
+  display: inline-block;
+}
+.thumb-wrap img {
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border: 1px solid var(--sand);
+  display: block;
+}
+.thumb-del {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'DM Sans', sans-serif;
+  z-index: 10;
+}
+.thumb-del:hover { background: #c0392b; }
+
+/* Кнопки */
+.btn-add-pos {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: 1px dashed var(--accent);
+  color: var(--accent);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.2s;
+  border-radius: 0;
+}
+.btn-add-pos:hover { background: var(--accent); color: #fff; }
+
+.total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark);
+  color: #fff;
+  padding: 14px 16px;
+  margin-top: 16px;
+}
+.total-bar-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent-light);
+}
+.total-bar-val {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.btn-gen {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: var(--dark);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: background 0.2s;
+  border-radius: 0;
+}
+.btn-gen:hover { background: var(--accent); }
+
+/* ─────────────────────────────────────────
+   ПАНЕЛЬ ДЕЙСТВИЙ (над/под pdf)
+───────────────────────────────────────── */
+.action-bar {
+  background: var(--cream);
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--sand);
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-back {
+  padding: 12px 28px;
+  background: none;
+  border: 1px solid var(--sand);
+  color: var(--dark);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.btn-print {
+  padding: 12px 28px;
+  background: var(--dark);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+/* ─────────────────────────────────────────
+   PDF СТРАНИЦЫ
+   Точно по шаблону: 210×297mm, portrait
+───────────────────────────────────────── */
+#pdf-pages {
+  background: #c8c4be;
+  padding: 12px 0;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  background: var(--cream);
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto 8px;
+  page-break-after: always;
+  break-after: page;
+}
+.page:last-child { page-break-after: avoid; break-after: avoid; }
+
+/* Полоса акцента слева */
+.accent-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-light) 50%, var(--accent) 100%);
+  z-index: 10;
+}
+
+/* ── СТРАНИЦА 1: шапка ── */
+.p1-header {
+  padding: 9mm 15mm 6mm 18mm;
+  border-bottom: 0.3mm solid var(--sand);
+}
+.p1-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 5mm;
+}
+.company-label {
+  font-size: 6.5pt;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  margin-bottom: 1mm;
+}
+.company-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26pt;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--crimson);
+  line-height: 1.05;
+}
+.company-tagline {
+  font-size: 8pt;
+  font-weight: 300;
+  color: var(--text-light);
+  margin-top: 1mm;
+  letter-spacing: 0.06em;
+}
+.doc-meta {
+  text-align: right;
+  flex-shrink: 0;
+  padding-top: 1mm;
+}
+.doc-date {
+  font-size: 8.5pt;
+  font-weight: 300;
+  color: var(--taupe);
+  letter-spacing: 0.05em;
+}
+/* Клиент в doc-meta */
+.doc-client-label {
+  font-size: 6pt;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  margin-top: 2mm;
+  margin-bottom: 0.5mm;
+}
+.doc-client-val {
+  font-size: 8.5pt;
+  font-weight: 500;
+  color: var(--dark);
+  letter-spacing: 0.02em;
+}
+
+.delivery-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2mm;
+}
+.delivery-icon {
+  width: 3.5mm;
+  height: 3.5mm;
+  margin-top: 0.5mm;
+  flex-shrink: 0;
+  opacity: 0.4;
+}
+.delivery-label {
+  font-size: 6.5pt;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  margin-bottom: 0.5mm;
+}
+.delivery-address {
+  font-size: 8.5pt;
+  font-weight: 300;
+  color: var(--text);
+}
+
+.divider {
+  width: 10mm;
+  height: 0.4mm;
+  background: var(--accent-light);
+  margin: 4mm 0 4mm 18mm;
+}
+
+/* Таблица состава */
+.items-section { padding: 0 15mm 0 18mm; }
+.section-title {
+  font-size: 6.5pt;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 3mm;
+}
+.items-tbl { width: 100%; border-collapse: collapse; }
+.items-tbl thead tr { border-bottom: 0.3mm solid var(--sand); }
+.items-tbl th {
+  font-size: 6pt;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  padding: 0 0 1.8mm 0;
+  text-align: left;
+}
+.items-tbl th.r { text-align: right; }
+.items-tbl th.c { text-align: center; }
+.items-tbl tbody tr { border-bottom: 0.2mm solid rgba(196,184,164,0.22); }
+.items-tbl tbody tr:last-child { border-bottom: none; }
+.items-tbl td {
+  padding: 1.5mm 0;
+  font-size: 8pt;
+  font-weight: 300;
+  color: var(--text);
+  vertical-align: middle;
+  line-height: 1.3;
+}
+.items-tbl .cn { font-size: 6.5pt; color: var(--taupe); width: 7mm; font-weight: 400; }
+.items-tbl .nm { font-weight: 400; color: var(--dark); }
+.items-tbl .qt { text-align: center; width: 12mm; color: var(--text-light); font-size: 7.5pt; }
+.items-tbl .pr { text-align: right; width: 26mm; font-weight: 400; color: var(--dark); }
+
+/* Итого */
+.total-section { margin-top: 3mm; padding: 0 15mm 0 18mm; }
+.total-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2.5mm 0;
+  border-top: 0.5mm solid var(--dark);
+  border-bottom: 0.5mm solid var(--dark);
+}
+.total-label {
+  font-size: 7.5pt;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dark);
+}
+.total-amount {
+  font-size: 12pt;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+/* Визуализация на стр.1 */
+.viz-section { margin-top: 4mm; padding: 0 15mm 0 18mm; }
+.viz-label {
+  font-size: 6.5pt;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  margin-bottom: 2mm;
+}
+.viz-box {
+  width: 100%;
+  border: 0.3mm solid var(--sand);
+  overflow: hidden;
+}
+.viz-box img { width: 100%; max-height: 85mm; object-fit: contain; display: block; }
+
+/* Футер стр.1 — с менеджером и сайтом */
+.p1-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 2.5mm 15mm 2.5mm 18mm;
+  border-top: 0.3mm solid var(--sand);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--cream);
+}
+.p1-footer-mgr {
+  font-size: 8pt;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+.p1-footer-site {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8pt;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+.p1-footer-page { font-size: 7pt; color: var(--taupe); }
+
+/* ── ВНУТРЕННИЕ СТРАНИЦЫ ПОЗИЦИЙ ──
+   Шаблон: 2 позиции на странице.
+   Верх (top 14mm) + Низ (top 149mm).
+   Каждая высота 135mm.
+   Левый слот фото 73mm, правый инфо — остаток.
+───────────────────────────────────────── */
+.inner-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 14mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15mm 0 18mm;
+  border-bottom: 0.3mm solid var(--sand);
+}
+.inner-company {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10.5pt;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--crimson);
+}
+.inner-title {
+  font-size: 6.5pt;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+.inner-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 13mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15mm 0 18mm;
+  border-top: 0.3mm solid var(--sand);
+  background: var(--cream);
+}
+.footer-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 8pt;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--taupe);
+  letter-spacing: 0.05em;
+}
+.footer-page { font-size: 7pt; color: var(--taupe); }
+
+/* Разделитель между двумя позициями */
+.half-divider {
+  position: absolute;
+  top: 149mm;
+  left: 18mm; right: 15mm;
+  height: 0.3mm;
+  background: var(--sand);
+}
+.half-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; top: -0.15mm;
+  width: 8mm; height: 0.6mm;
+  background: var(--accent-light);
+}
+
+/* Половинка позиции */
+.item-half {
+  position: absolute;
+  left: 0; right: 0;
+  height: 135mm;
+  display: flex;
+  flex-direction: row;
+  padding: 5mm 15mm 5mm 18mm;
+  gap: 6mm;
+}
+.item-half.top { top: 14mm; }
+.item-half.bot { top: 149mm; }
+
+/* Левая колонка — фото */
+.photo-col {
+  width: 73mm;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5mm;
+}
+.photo-slot {
+  flex: 1;
+  background: var(--warm-white);
+  border: 0.3mm solid var(--sand);
+  overflow: hidden;
+  position: relative;
+}
+.photo-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.photo-num {
+  position: absolute;
+  top: 2mm; left: 2mm;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 7pt;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  background: rgba(250,248,244,0.9);
+  padding: 0.5mm 2mm;
+  z-index: 5;
+}
+.no-photo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--taupe);
+  font-size: 6.5pt;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Правая колонка — описание */
+.info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.item-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13pt;
+  font-weight: 600;
+  color: var(--dark);
+  line-height: 1.15;
+  margin-bottom: 1.5mm;
+}
+.name-accent {
+  width: 7mm;
+  height: 0.5mm;
+  background: var(--accent-light);
+  margin-bottom: 3mm;
+  flex-shrink: 0;
+}
+.specs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.spec-row {
+  padding: 1.8mm 0;
+  border-bottom: 0.2mm solid rgba(196,184,164,0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5mm;
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-label {
+  font-size: 6pt;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.spec-value {
+  font-size: 8pt;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+.item-price {
+  margin-top: auto;
+  padding-top: 2.5mm;
+  border-top: 0.3mm solid var(--sand);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.price-label {
+  font-size: 6pt;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.price-val {
+  font-size: 10.5pt;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+/* ─────────────────────────────────────────
+   PRINT
+───────────────────────────────────────── */
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  #form-wrap { display: none !important; }
+  .action-bar { display: none !important; }
+  #pdf-wrap { display: block !important; }
+  #pdf-pages { background: none; padding: 0; }
+  .page { margin: 0; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     ФОРМА
+═══════════════════════════════════════ -->
+<div id="form-wrap">
+
+  <div class="form-header">
+    <div class="form-sub">Конструктор документов</div>
+    <div class="form-logo">Старт Мебель</div>
+    <div class="form-sub" style="margin-top:4px;">Коммерческое предложение</div>
+  </div>
+
+  <!-- ОБЩАЯ ИНФОРМАЦИЯ -->
+  <div class="fsec">Общая информация</div>
+
+  <div class="g2">
+    <div class="frow">
+      <label>Дата</label>
+      <input type="date" id="f-date">
+    </div>
+    <div class="frow">
+      <label>Менеджер</label>
+      <select id="f-manager" onchange="onMgrChange()">
+        <option value="">— выбрать —</option>
+        <option value="Елена">Елена</option>
+        <option value="Даниил">Даниил</option>
+        <option value="Антон">Антон</option>
+        <option value="Сергей">Сергей</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Авто-поле телефона менеджера (readonly) -->
+  <div class="frow" id="mgr-phone-row" style="display:none">
+    <label>Телефон менеджера</label>
+    <input type="text" id="f-mgr-phone" readonly style="background:var(--warm-white);color:var(--taupe);">
+  </div>
+
+  <div class="frow">
+    <label>Клиент / Компания</label>
+    <input type="text" id="f-client" placeholder="Иванов Иван Иванович / ООО «Ромашка»">
+  </div>
+
+  <div class="frow">
+    <label>Адрес поставки</label>
+    <input type="text" id="f-address" placeholder="г. Москва, ул. …">
+  </div>
+
+  <!-- ВИЗУАЛИЗАЦИЯ -->
+  <div class="fsec">Визуализация проекта (общая)</div>
+  <div class="photo-zone" id="viz-zone">
+    <input type="file" accept="image/*" id="viz-input" onchange="handleViz(this)">
+    <div class="photo-zone-label">📷 Загрузить визуализацию (1 фото)</div>
+    <div class="photo-thumbs" id="viz-thumbs"></div>
+  </div>
+
+  <!-- ПОЗИЦИИ -->
+  <div class="fsec">Состав заказа</div>
+  <div id="pos-list"></div>
+  <button class="btn-add-pos" onclick="addPos()">+ Добавить позицию</button>
+
+  <!-- ИТОГО -->
+  <div class="total-bar">
+    <span class="total-bar-label">Итого к оплате</span>
+    <span class="total-bar-val" id="f-total">0 ₽</span>
+  </div>
+
+  <button class="btn-gen" onclick="generate()">Сформировать КП →</button>
+
+</div><!-- /form-wrap -->
+
+<!-- ═══════════════════════════════════════
+     PDF ВЫВОД
+═══════════════════════════════════════ -->
+<div id="pdf-wrap">
+  <div class="action-bar">
+    <button class="btn-back" onclick="goBack()">← Редактировать</button>
+    <button class="btn-print" onclick="window.print()">🖨 Печать / PDF</button>
+  </div>
+  <div id="pdf-pages"></div>
+  <div class="action-bar" style="border-top:1px solid var(--sand);border-bottom:none;">
+    <button class="btn-back" onclick="goBack()">← Редактировать</button>
+    <button class="btn-print" onclick="window.print()">🖨 Печать / PDF</button>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────
+   ДАННЫЕ МЕНЕДЖЕРОВ
+───────────────────────────────────────── */
+const MANAGERS = {
+  'Елена':   { phone: '+7 (927) 738-66-05' },
+  'Даниил':  { phone: '+7 (937) 183-24-78' },
+  'Антон':   { phone: '+7 (927) 747-80-46' },
+  'Сергей':  { phone: '+7 (937) 204-69-69' },
+};
+
+const SITE        = 'startsamara.ru';
+const OFFICE_PHONE = '+7 (846) 990-28-46';
+
+function onMgrChange() {
+  const name = document.getElementById('f-manager').value;
+  const row  = document.getElementById('mgr-phone-row');
+  const inp  = document.getElementById('f-mgr-phone');
+  if (name && MANAGERS[name]) {
+    inp.value = MANAGERS[name].phone;
+    row.style.display = 'block';
+  } else {
+    row.style.display = 'none';
+    inp.value = '';
+  }
+}
+
+/* ─────────────────────────────────────────
+   ВИЗУАЛИЗАЦИЯ
+───────────────────────────────────────── */
+let vizPhotos = [];
+
+function handleViz(input) {
+  if (!input.files.length) return;
+  const file = input.files[0]; // только одно фото
+  const reader = new FileReader();
+  reader.onload = e => {
+    vizPhotos = [e.target.result]; // заменяем, не накапливаем
+    const thumbs = document.getElementById('viz-thumbs');
+    thumbs.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb-wrap';
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    const btn = document.createElement('button');
+    btn.className = 'thumb-del';
+    btn.textContent = '✕';
+    btn.onclick = (ev) => {
+      ev.preventDefault();
+      vizPhotos = [];
+      thumbs.innerHTML = '';
+      document.getElementById('viz-input').value = '';
+    };
+    wrap.appendChild(img);
+    wrap.appendChild(btn);
+    thumbs.appendChild(wrap);
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ─────────────────────────────────────────
+   ПОЗИЦИИ
+───────────────────────────────────────── */
+let posIds  = [];
+let posData = {}; // id → { photoB64: [] }
+let counter = 0;
+
+function addPos() {
+  const id = ++counter;
+  posIds.push(id);
+  posData[id] = { photos: [] };
+
+  const card = document.createElement('div');
+  card.className = 'pos-card';
+  card.id = 'card-' + id;
+  card.innerHTML = `
+    <div class="pos-card-head">
+      <div class="pos-card-num">№ ${String(id).padStart(2,'0')}</div>
+      <button class="btn-rem" onclick="removePos(${id})">✕ Удалить</button>
+    </div>
+
+    <div class="frow">
+      <label>Наименование позиции</label>
+      <input type="text" id="n${id}" placeholder="Кухонный гарнитур" oninput="calcTotal()">
+    </div>
+
+    <div class="g3">
+      <div class="frow">
+        <label>Кол-во (шт)</label>
+        <input type="number" id="q${id}" value="1" min="1" step="1" oninput="calcTotal()">
+      </div>
+      <div class="frow">
+        <label>Цена за 1 шт (₽)</label>
+        <input type="number" id="u${id}" placeholder="0" min="0" oninput="calcTotal()">
+      </div>
+      <div class="frow">
+        <label>Сумма (₽)</label>
+        <input type="text" id="s${id}" readonly style="background:var(--warm-white);color:var(--text-light);font-weight:400;">
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="frow">
+        <label>Материал корпуса</label>
+        <input type="text" id="corp${id}" placeholder="ЛДСП Эггер">
+      </div>
+      <div class="frow">
+        <label>Материал фасадов</label>
+        <input type="text" id="fas${id}" placeholder="МДФ пленка">
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="frow">
+        <label>Фурнитура</label>
+        <input type="text" id="fur${id}" placeholder="Blum (Австрия)">
+      </div>
+      <div class="frow">
+        <label>Столешница</label>
+        <input type="text" id="top${id}" placeholder="Кварц / ЛДСП / Искусственный камень">
+      </div>
+    </div>
+
+    <div class="frow">
+      <label>Дополнительная информация</label>
+      <textarea id="extra${id}" maxlength="1000" placeholder="Любые особенности, комментарии к позиции… (макс. 1000 символов)"></textarea>
+    </div>
+
+    <div class="frow">
+      <label>Фото / Чертёж изделия</label>
+      <div class="photo-zone">
+        <input type="file" accept="image/*" multiple onchange="handlePosPhoto(this,${id})">
+        <div class="photo-zone-label">📷 Загрузить фото изделия</div>
+        <div class="photo-thumbs" id="thumbs-${id}"></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('pos-list').appendChild(card);
+  calcTotal();
+}
+
+function removePos(id) {
+  posIds = posIds.filter(p => p !== id);
+  delete posData[id];
+  const card = document.getElementById('card-' + id);
+  if (card) card.remove();
+  calcTotal();
+}
+
+function handlePosPhoto(input, id) {
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const src = e.target.result;
+      const idx = posData[id].photos.length;
+      posData[id].photos.push(src);
+
+      const thumbs = document.getElementById('thumbs-' + id);
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb-wrap';
+      wrap.dataset.idx = idx;
+
+      const img = document.createElement('img');
+      img.src = src;
+
+      const btn = document.createElement('button');
+      btn.className = 'thumb-del';
+      btn.textContent = '✕';
+      btn.onclick = (ev) => {
+        ev.preventDefault();
+        const i = posData[id].photos.indexOf(src);
+        if (i !== -1) posData[id].photos.splice(i, 1);
+        wrap.remove();
+      };
+      wrap.appendChild(img);
+      wrap.appendChild(btn);
+      thumbs.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ─────────────────────────────────────────
+   РАСЧЁТ ИТОГО
+───────────────────────────────────────── */
+function calcTotal() {
+  let total = 0;
+  posIds.forEach(id => {
+    const qty   = parseFloat(document.getElementById('q'  + id)?.value || 0) || 0;
+    const unit  = parseFloat(document.getElementById('u'  + id)?.value || 0) || 0;
+    const sum   = qty * unit;
+    const sEl   = document.getElementById('s' + id);
+    if (sEl) sEl.value = sum > 0 ? fmtNum(sum) + ' ₽' : '';
+    total += sum;
+  });
+  document.getElementById('f-total').textContent = fmtNum(total) + ' ₽';
+}
+
+/* ─────────────────────────────────────────
+   УТИЛИТЫ
+───────────────────────────────────────── */
+function fmtNum(n) {
+  return Math.round(n).toLocaleString('ru-RU');
+}
+
+function fmtDate(str) {
+  if (!str) return new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+  const d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+}
+
+/* ─────────────────────────────────────────
+   ГЕНЕРАЦИЯ PDF
+───────────────────────────────────────── */
+function generate() {
+  const date    = fmtDate(document.getElementById('f-date').value);
+  const mgrName = document.getElementById('f-manager').value || '';
+  const mgrPhone= mgrName && MANAGERS[mgrName] ? MANAGERS[mgrName].phone : '';
+  const client  = document.getElementById('f-client').value.trim() || '';
+  const address = document.getElementById('f-address').value.trim() || '—';
+
+  /* Собрать данные позиций */
+  const positions = posIds.map((id, i) => {
+    const qty  = parseFloat(document.getElementById('q' + id)?.value || 1) || 1;
+    const unit = parseFloat(document.getElementById('u' + id)?.value || 0) || 0;
+    return {
+      num:    String(i + 1).padStart(2, '0'),
+      name:   document.getElementById('n'    + id)?.value?.trim() || '—',
+      qty:    qty,
+      unit:   unit,
+      sum:    qty * unit,
+      corp:   document.getElementById('corp' + id)?.value?.trim() || '—',
+      fas:    document.getElementById('fas'  + id)?.value?.trim() || '—',
+      furn:   document.getElementById('fur'  + id)?.value?.trim() || '—',
+      top:    document.getElementById('top'  + id)?.value?.trim() || '',
+      extra:  document.getElementById('extra'+ id)?.value?.trim() || '',
+      photos: posData[id]?.photos || [],
+    };
+  });
+
+  const grandTotal = positions.reduce((s, p) => s + p.sum, 0);
+  /* Всего страниц: 1 (сводная) + ceil(positions.length / 2) */
+  const totalPages = 1 + Math.ceil(positions.length / 2);
+
+  let html = '';
+
+  /* ─── СТРАНИЦА 1: Сводная ─── */
+  html += `
+  <div class="page">
+    <div class="accent-bar"></div>
+
+    <div class="p1-header">
+      <div class="p1-header-top">
+        <div>
+          <div class="company-label">Коммерческое предложение</div>
+          <div class="company-name">Старт Мебель</div>
+          <div class="company-tagline">Мебель на заказ · Производство и поставка</div>
+        </div>
+        <div class="doc-meta">
+          <div class="doc-date">${date}</div>
+          <div class="doc-client-label" style="margin-top:2mm;">Офис: ${esc(OFFICE_PHONE)}</div>
+          ${client ? `<div class="doc-client-label" style="margin-top:2mm;">Клиент</div><div class="doc-client-val">${esc(client)}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="delivery-row">
+        <svg class="delivery-icon" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1C4.79 1 3 2.79 3 5c0 3.25 4 8 4 8s4-4.75 4-8c0-2.21-1.79-4-4-4z" stroke="#7A6A56" stroke-width="1"/>
+          <circle cx="7" cy="5" r="1.5" stroke="#7A6A56" stroke-width="1"/>
+        </svg>
+        <div>
+          <div class="delivery-label">Адрес поставки</div>
+          <div class="delivery-address">${esc(address)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="items-section">
+      <div class="section-title">Состав заказа</div>
+      <table class="items-tbl">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Наименование</th>
+            <th class="c">Кол-во</th>
+            <th class="r">Стоимость</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${positions.map(p => `
+            <tr>
+              <td class="cn">${p.num}</td>
+              <td class="nm">${esc(p.name)}</td>
+              <td class="qt">${p.qty} шт.</td>
+              <td class="pr">${fmtNum(p.sum)} ₽</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="total-section">
+      <div class="total-inner">
+        <span class="total-label">Итого к оплате</span>
+        <span class="total-amount">${fmtNum(grandTotal)} ₽</span>
+      </div>
+    </div>
+
+    ${vizPhotos.length > 0 ? `
+      <div class="viz-section">
+        <div class="viz-label">Визуализация проекта</div>
+        <div class="viz-box"><img src="${vizPhotos[0]}" alt="Визуализация"></div>
+      </div>
+    ` : ''}
+
+    <div class="p1-footer">
+      <div class="p1-footer-mgr">${mgrName ? esc(mgrName) + (mgrPhone ? ' · ' + esc(mgrPhone) : '') : 'Офис: ' + esc(OFFICE_PHONE)}</div>
+      <div class="p1-footer-site">${SITE}</div>
+      <div class="p1-footer-page">1 / ${totalPages}</div>
+    </div>
+  </div>`;
+
+  /* ─── СТРАНИЦЫ ПОЗИЦИЙ (по 2 на странице) ─── */
+  for (let i = 0; i < positions.length; i += 2) {
+    const pageNum = 2 + Math.floor(i / 2);
+    const posA    = positions[i];
+    const posB    = positions[i + 1] || null;
+
+    html += `
+    <div class="page">
+      <div class="accent-bar"></div>
+
+      <div class="inner-header">
+        <span class="inner-company">Старт Мебель</span>
+        <span class="inner-title">Коммерческое предложение · ${date}</span>
+      </div>
+
+      <!-- ВЕРХНЯЯ ПОЛОВИНА -->
+      <div class="item-half top">
+        <div class="photo-col">
+          <div class="photo-slot">
+            <div class="photo-num">№ ${posA.num}</div>
+            ${posA.photos[0]
+              ? `<img src="${posA.photos[0]}" alt="">`
+              : `<div class="no-photo">Фото</div>`}
+          </div>
+          <div class="photo-slot">
+            ${posA.photos[1]
+              ? `<img src="${posA.photos[1]}" alt="">`
+              : `<div class="no-photo" style="height:100%"></div>`}
+          </div>
+        </div>
+        <div class="info-col">
+          <div class="item-name">${esc(posA.name)}</div>
+          <div class="name-accent"></div>
+          <div class="specs">
+            <div class="spec-row">
+              <div class="spec-label">Материал корпуса</div>
+              <div class="spec-value">${esc(posA.corp)}</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Материал фасадов</div>
+              <div class="spec-value">${esc(posA.fas)}</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Фурнитура</div>
+              <div class="spec-value">${esc(posA.furn)}</div>
+            </div>
+            ${posA.top ? `<div class="spec-row"><div class="spec-label">Столешница</div><div class="spec-value">${esc(posA.top)}</div></div>` : ''}
+            <div class="spec-row">
+              <div class="spec-label">Количество</div>
+              <div class="spec-value">${posA.qty} шт.</div>
+            </div>
+            ${posA.extra ? `<div class="spec-row"><div class="spec-label">Доп. информация</div><div class="spec-value">${esc(posA.extra)}</div></div>` : ''}
+          </div>
+          <div class="item-price">
+            <span class="price-label">Стоимость</span>
+            <span class="price-val">${fmtNum(posA.sum)} ₽</span>
+          </div>
+        </div>
+      </div>
+
+      ${posB ? `
+      <div class="half-divider"></div>
+
+      <!-- НИЖНЯЯ ПОЛОВИНА -->
+      <div class="item-half bot">
+        <div class="photo-col">
+          <div class="photo-slot">
+            <div class="photo-num">№ ${posB.num}</div>
+            ${posB.photos[0]
+              ? `<img src="${posB.photos[0]}" alt="">`
+              : `<div class="no-photo">Фото</div>`}
+          </div>
+          <div class="photo-slot">
+            ${posB.photos[1]
+              ? `<img src="${posB.photos[1]}" alt="">`
+              : `<div class="no-photo" style="height:100%"></div>`}
+          </div>
+        </div>
+        <div class="info-col">
+          <div class="item-name">${esc(posB.name)}</div>
+          <div class="name-accent"></div>
+          <div class="specs">
+            <div class="spec-row">
+              <div class="spec-label">Материал корпуса</div>
+              <div class="spec-value">${esc(posB.corp)}</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Материал фасадов</div>
+              <div class="spec-value">${esc(posB.fas)}</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Фурнитура</div>
+              <div class="spec-value">${esc(posB.furn)}</div>
+            </div>
+            ${posB.top ? `<div class="spec-row"><div class="spec-label">Столешница</div><div class="spec-value">${esc(posB.top)}</div></div>` : ''}
+            <div class="spec-row">
+              <div class="spec-label">Количество</div>
+              <div class="spec-value">${posB.qty} шт.</div>
+            </div>
+            ${posB.extra ? `<div class="spec-row"><div class="spec-label">Доп. информация</div><div class="spec-value">${esc(posB.extra)}</div></div>` : ''}
+          </div>
+          <div class="item-price">
+            <span class="price-label">Стоимость</span>
+            <span class="price-val">${fmtNum(posB.sum)} ₽</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <div class="inner-footer">
+        <span class="footer-note">Старт Мебель · Коммерческое предложение</span>
+        <span class="footer-page">${pageNum} / ${totalPages}</span>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('pdf-pages').innerHTML = html;
+  document.getElementById('form-wrap').style.display = 'none';
+  document.getElementById('pdf-wrap').style.display  = 'block';
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  document.getElementById('form-wrap').style.display = 'block';
+  document.getElementById('pdf-wrap').style.display  = 'none';
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ─── ИНИЦИАЛИЗАЦИЯ ─── */
+document.getElementById('f-date').valueAsDate = new Date();
+addPos();
+</script>
+</body>
+</html>
