@@ -127,6 +127,7 @@ body {
 /* Сетки */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.g3 .frow label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Карточка позиции */
 .pos-card {
@@ -973,7 +974,7 @@ function addPos() {
         <input type="number" id="q${id}" value="1" min="1" step="1" oninput="calcTotal()">
       </div>
       <div class="frow">
-        <label>Цена за 1 шт (₽)</label>
+        <label style="white-space:nowrap;">Цена / шт (₽)</label>
         <input type="number" id="u${id}" placeholder="0" min="0" oninput="calcTotal()">
       </div>
       <div class="frow">
@@ -1335,19 +1336,15 @@ async function downloadPdf() {
   const date   = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
   const fname  = ('КП_СтартМебель' + (client ? '_' + client : '') + '_' + date).replace(/\s+/g,'_') + '.pdf';
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-  // A4 at 96dpi: 210mm = 794px, 297mm = 1123px
-  // Рендерим в фиксированный размер независимо от экрана
-  const A4_PX_W = 794;
-  const A4_PX_H = 1123;
-  const SCALE   = 2; // качество
+  // A4 в пикселях при 96dpi
+  const A4_W = 794;
+  const A4_H = 1123;
+  const SCALE = 2;
 
   try {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const pdf  = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pages = document.querySelectorAll('#pdf-pages .page');
-    const W = 210, H = 297;
 
     for (let i = 0; i < pages.length; i++) {
       if (i > 0) pdf.addPage();
@@ -1355,11 +1352,15 @@ async function downloadPdf() {
 
       const page = pages[i];
 
-      // Временно форсируем нужные размеры для корректного рендера
-      const prevWidth  = page.style.width;
-      const prevHeight = page.style.height;
-      page.style.width  = A4_PX_W + 'px';
-      page.style.height = A4_PX_H + 'px';
+      // Сохраняем стили
+      const savedWidth  = page.style.width;
+      const savedHeight = page.style.height;
+      const savedPos    = page.style.position;
+
+      // Форсируем точный A4 размер для рендера
+      page.style.width    = A4_W + 'px';
+      page.style.height   = A4_H + 'px';
+      page.style.position = 'relative';
 
       const canvas = await html2canvas(page, {
         scale:       SCALE,
@@ -1367,30 +1368,37 @@ async function downloadPdf() {
         allowTaint:  true,
         scrollX:     0,
         scrollY:     0,
-        width:       A4_PX_W,
-        height:      A4_PX_H,
-        windowWidth: A4_PX_W,
+        x:           0,
+        y:           0,
+        width:       A4_W,
+        height:      A4_H,
+        windowWidth: A4_W,
+        windowHeight:A4_H,
+        logging:     false,
       });
 
-      // Возвращаем оригинальные стили
-      page.style.width  = prevWidth;
-      page.style.height = prevHeight;
+      // Восстанавливаем стили
+      page.style.width    = savedWidth;
+      page.style.height   = savedHeight;
+      page.style.position = savedPos;
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.97);
-      pdf.addImage(imgData, 'JPEG', 0, 0, W, H);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, '', 'FAST');
     }
 
-    if (isIOS) {
-      const pdfBlob = pdf.output('bloburl');
-      window.open(pdfBlob, '_blank');
-      btns.forEach(b => { b.textContent = '💾 Открыт в новой вкладке'; });
-      setTimeout(() => {
-        btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
-      }, 3000);
-    } else {
-      pdf.save(fname);
-      btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
-    }
+    // Получаем dataURL — работает везде включая iOS Safari
+    const pdfDataUri = pdf.output('datauristring');
+
+    // Создаём временную ссылку
+    const link = document.createElement('a');
+    link.href = pdfDataUri;
+    link.download = fname;
+    link.target = '_blank'; // iOS откроет в новой вкладке
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
 
   } catch(e) {
     console.error(e);
