@@ -1335,8 +1335,13 @@ async function downloadPdf() {
   const date   = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
   const fname  = ('КП_СтартМебель' + (client ? '_' + client : '') + '_' + date).replace(/\s+/g,'_') + '.pdf';
 
-  // Определяем iOS Safari
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  // A4 at 96dpi: 210mm = 794px, 297mm = 1123px
+  // Рендерим в фиксированный размер независимо от экрана
+  const A4_PX_W = 794;
+  const A4_PX_H = 1123;
+  const SCALE   = 2; // качество
 
   try {
     const { jsPDF } = window.jspdf;
@@ -1348,23 +1353,34 @@ async function downloadPdf() {
       if (i > 0) pdf.addPage();
       btns.forEach(b => { b.textContent = `⏳ Страница ${i+1} / ${pages.length}…`; });
 
-      const canvas = await html2canvas(pages[i], {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        scrollX: 0,
-        scrollY: 0,
-        width: pages[i].offsetWidth,
-        height: pages[i].offsetHeight,
-        windowWidth: pages[i].offsetWidth,
+      const page = pages[i];
+
+      // Временно форсируем нужные размеры для корректного рендера
+      const prevWidth  = page.style.width;
+      const prevHeight = page.style.height;
+      page.style.width  = A4_PX_W + 'px';
+      page.style.height = A4_PX_H + 'px';
+
+      const canvas = await html2canvas(page, {
+        scale:       SCALE,
+        useCORS:     true,
+        allowTaint:  true,
+        scrollX:     0,
+        scrollY:     0,
+        width:       A4_PX_W,
+        height:      A4_PX_H,
+        windowWidth: A4_PX_W,
       });
+
+      // Возвращаем оригинальные стили
+      page.style.width  = prevWidth;
+      page.style.height = prevHeight;
 
       const imgData = canvas.toDataURL('image/jpeg', 0.97);
       pdf.addImage(imgData, 'JPEG', 0, 0, W, H);
     }
 
     if (isIOS) {
-      // iOS Safari: открываем PDF в новой вкладке — там можно сохранить через share
       const pdfBlob = pdf.output('bloburl');
       window.open(pdfBlob, '_blank');
       btns.forEach(b => { b.textContent = '💾 Открыт в новой вкладке'; });
