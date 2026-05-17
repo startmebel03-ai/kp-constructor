@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Старт Мебель · Конструктор КП</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ─────────────────────────────────────────
    CSS VARIABLES
@@ -257,16 +258,20 @@ body {
   color: #fff;
   padding: 14px 16px;
   margin-top: 16px;
+  flex-wrap: nowrap;
+  gap: 8px;
 }
 .total-bar-label {
   font-size: 9px;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--accent-light);
+  flex-shrink: 0;
 }
 .total-bar-val {
   font-size: 20px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .btn-gen {
@@ -1319,7 +1324,7 @@ function generate() {
   window.scrollTo(0, 0);
 }
 
-function downloadPdf() {
+async function downloadPdf() {
   const btns = [document.getElementById('btn-dl-top'), document.getElementById('btn-dl-bot')];
   btns.forEach(b => { b.disabled = true; b.textContent = '⏳ Генерация…'; });
 
@@ -1327,23 +1332,38 @@ function downloadPdf() {
   const date   = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
   const fname  = ('КП_СтартМебель' + (client ? '_' + client : '') + '_' + date).replace(/\s+/g,'_') + '.pdf';
 
-  const el = document.getElementById('pdf-pages');
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const pages = document.querySelectorAll('#pdf-pages .page');
+    const W = 210, H = 297;
 
-  const opt = {
-    margin:      0,
-    filename:    fname,
-    image:       { type: 'jpeg', quality: 0.97 },
-    html2canvas: { scale: 2, useCORS: true, allowTaint: true, scrollY: 0 },
-    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:   { mode: ['css', 'legacy'] }
-  };
+    for (let i = 0; i < pages.length; i++) {
+      if (i > 0) pdf.addPage();
+      btns.forEach(b => { b.textContent = `⏳ Страница ${i+1} / ${pages.length}…`; });
 
-  html2pdf().set(opt).from(el).save().then(() => {
+      const canvas = await html2canvas(pages[i], {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollX: 0,
+        scrollY: 0,
+        width: pages[i].offsetWidth,
+        height: pages[i].offsetHeight,
+        windowWidth: pages[i].offsetWidth,
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.97);
+      pdf.addImage(imgData, 'JPEG', 0, 0, W, H);
+    }
+
+    pdf.save(fname);
     btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
-  }).catch(() => {
+  } catch(e) {
+    console.error(e);
     btns.forEach(b => { b.disabled = false; b.textContent = '⬇ Скачать PDF'; });
     alert('Ошибка генерации PDF. Попробуйте ещё раз.');
-  });
+  }
 }
 
 function goBack() {
